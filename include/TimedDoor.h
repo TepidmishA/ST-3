@@ -3,6 +3,9 @@
 #ifndef INCLUDE_TIMEDDOOR_H_
 #define INCLUDE_TIMEDDOOR_H_
 
+#include <thread>
+#include <atomic>
+
 class DoorTimerAdapter;
 class Timer;
 class Door;
@@ -23,9 +26,24 @@ class Door {
 class DoorTimerAdapter : public TimerClient {
  private:
   TimedDoor& door;
+
  public:
   explicit DoorTimerAdapter(TimedDoor&);
   void Timeout();
+};
+
+class Timer {
+  std::thread worker;
+  std::atomic<bool> isRunning;
+
+  TimerClient *client;
+  void sleep(int);
+
+ public:
+  ~Timer();
+
+  void stopWorker();
+  void tregister(int, TimerClient*);
 };
 
 class TimedDoor : public Door {
@@ -33,20 +51,18 @@ class TimedDoor : public Door {
   DoorTimerAdapter * adapter;
   int iTimeout;
   bool isOpened;
+  Timer timer;
  public:
+  ~TimedDoor();
   explicit TimedDoor(int);
+
   bool isDoorOpened();
   void unlock();
   void lock();
   int  getTimeOut() const;
   void throwState();
-};
 
-class Timer {
-  TimerClient *client;
-  void sleep(int);
- public:
-  void tregister(int, TimerClient*);
+  void changeAdapter(DoorTimerAdapter*);
 };
 
 #endif  // INCLUDE_TIMEDDOOR_H_

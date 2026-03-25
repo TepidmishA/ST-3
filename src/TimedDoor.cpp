@@ -15,6 +15,15 @@ void DoorTimerAdapter::Timeout() {
     }
 }
 
+void TimedDoor::changeAdapter(DoorTimerAdapter* _adapter) {
+    adapter = _adapter;
+}
+
+TimedDoor::~TimedDoor() {
+    timer.stopWorker();
+    delete adapter;
+}
+
 //
 // TimedDoor
 //
@@ -31,7 +40,6 @@ bool TimedDoor::isDoorOpened() {
 void TimedDoor::unlock() {
     isOpened = true;
 
-    Timer timer;
     timer.tregister(iTimeout, adapter);
 }
 
@@ -50,18 +58,33 @@ void TimedDoor::throwState() {
 //
 // Timer
 //
-void Timer::sleep(int time)
-{
+void Timer::sleep(int time) {
     std::this_thread::sleep_for(std::chrono::seconds(time));
 }
 
-void Timer::tregister(int timeout, TimerClient* _client)
-{
-    client = _client;
+void Timer::stopWorker() {
+    isRunning = false;
+    if (worker.joinable()) {
+        worker.detach();
+    }
+}
 
-    std::thread([this, timeout]()
+Timer::~Timer() {
+    stopWorker();
+}
+
+void Timer::tregister(int timeout, TimerClient *_client)
+{
+    stopWorker();
+    isRunning = true;
+
+    client = _client;
+    worker = std::thread([this, timeout]()
     {
         sleep(timeout);
-        client->Timeout();
-    }).detach();
+
+        if (isRunning && client) {
+            client->Timeout();
+        }
+    });
 }
