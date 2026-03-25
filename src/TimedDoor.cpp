@@ -73,14 +73,12 @@ Timer::~Timer() {
     stopWorker();
 }
 
-void Timer::tregister(int timeout, TimerClient *_client)
-{
+void Timer::tregister(int timeout, TimerClient *_client) {
     stopWorker();
     isRunning = true;
 
     client = _client;
-    worker = std::thread([this, timeout]()
-    {
+    worker = std::thread([this, timeout]() {
         sleep(timeout);
 
         if (isRunning && client) {

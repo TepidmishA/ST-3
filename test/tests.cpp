@@ -11,7 +11,7 @@
 using ::testing::Exactly;
 
 class TimedDoorTest : public ::testing::Test {
-protected:
+ protected:
     TimedDoor* door;
 
     void SetUp() override {
@@ -72,7 +72,7 @@ TEST_F(TimedDoorTest, ThrowState_ThrowsRuntimeError) {
 // DoorTimerAdapter
 //
 class DoorTimerAdapterTest : public ::testing::Test {
-protected:
+ protected:
     TimedDoor* door;
     DoorTimerAdapter* adapter;
 
@@ -101,7 +101,7 @@ TEST_F(DoorTimerAdapterTest, TimeoutNoThrowIfDoorClosed) {
 // Timer
 //
 class MockTimerClient : public TimerClient {
-public:
+ public:
     MOCK_METHOD(void, Timeout, (), (override));
 };
 
@@ -126,7 +126,7 @@ TEST(TimerTest, TimerCallsTimeout) {
 // Integration
 //
 class TestDoorTimerAdapter : public DoorTimerAdapter {
-public:
+ public:
     std::exception_ptr* exception;
 
     TestDoorTimerAdapter(TimedDoor& door, std::exception_ptr* ex)
@@ -143,7 +143,7 @@ public:
 };
 
 class IntegrationTest : public ::testing::Test {
-protected:
+ protected:
     TimedDoor* door;
 
     TestDoorTimerAdapter* test_adapter;
