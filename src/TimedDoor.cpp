@@ -65,7 +65,7 @@ void Timer::sleep(int time) {
 void Timer::stopWorker() {
     isRunning = false;
     if (worker.joinable()) {
-        worker.detach();
+        worker.join();
     }
 }
 
